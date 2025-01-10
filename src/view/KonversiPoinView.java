@@ -34,9 +34,6 @@ public class KonversiPoinView {
                 Object[] row = {
                     rs.getInt("id"),
                     rs.getString("nama_lengkap"),
-                    rs.getString("email"),
-                    rs.getString("alamat_rumah"),
-                    rs.getString("no_telepon"),
                     rs.getInt("poin_sampah")
                 };
                 tableModel.addRow(row);
@@ -47,6 +44,7 @@ public class KonversiPoinView {
         }
     }
 
+    @SuppressWarnings("Convert2Lambda")
     public static void open() {
         JFrame frame = new JFrame("Konversi Poin");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -54,7 +52,8 @@ public class KonversiPoinView {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        String[] columnNames = {"ID", "Nama Lengkap", "Email", "Alamat Rumah", "No Telepon", "Poin Sampah"};
+        // Sesuaikan dengan kolom 
+        String[] columnNames = {"ID", "Nama Lengkap", "Poin Sampah"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
 
@@ -66,10 +65,7 @@ public class KonversiPoinView {
         // Mengatur lebar kolom
         table.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
         table.getColumnModel().getColumn(1).setPreferredWidth(150); // Nama Lengkap
-        table.getColumnModel().getColumn(2).setPreferredWidth(150); // Email
-        table.getColumnModel().getColumn(3).setPreferredWidth(200); // Alamat Rumah
-        table.getColumnModel().getColumn(4).setPreferredWidth(100); // No Telepon
-        table.getColumnModel().getColumn(5).setPreferredWidth(100); // Poin Sampah
+        table.getColumnModel().getColumn(2).setPreferredWidth(100); // Poin Sampah
 
         // Menambahkan JScrollPane untuk tabel
         JScrollPane tableScrollPane = new JScrollPane(table);
@@ -91,40 +87,26 @@ public class KonversiPoinView {
 
         addButton.addActionListener(new ActionListener() {
             @Override
+            @SuppressWarnings("CallToPrintStackTrace")
             public void actionPerformed(ActionEvent e) {
                 JTextField namaField = new JTextField(10);
-                JTextField emailField = new JTextField(10);
-                JTextField alamatField = new JTextField(10);
-                JTextField noTeleponField = new JTextField(10);
                 JTextField poinField = new JTextField(10);
 
-                JPanel inputPanel = new JPanel(new GridLayout(5, 2));
+                JPanel inputPanel = new JPanel(new GridLayout(2, 2));
                 inputPanel.add(new JLabel("Nama Lengkap:"));
                 inputPanel.add(namaField);
-                inputPanel.add(new JLabel("Email:"));
-                inputPanel.add(emailField);
-                inputPanel.add(new JLabel("Alamat Rumah:"));
-                inputPanel.add(alamatField);
-                inputPanel.add(new JLabel("No Telepon:"));
-                inputPanel.add(noTeleponField);
                 inputPanel.add(new JLabel("Poin Sampah:"));
                 inputPanel.add(poinField);
 
                 int result = JOptionPane.showConfirmDialog(frame, inputPanel, "Tambah Data", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
                     String nama = namaField.getText();
-                    String email = emailField.getText();
-                    String alamat = alamatField.getText();
-                    String noTelepon = noTeleponField.getText();
                     String poinSampah = poinField.getText();
 
                     try (Connection conn = connect(); 
-                         PreparedStatement ps = conn.prepareStatement("INSERT INTO konversi_poin (nama_lengkap, email, alamat_rumah, no_telepon, poin_sampah) VALUES (?, ?, ?, ?, ?)");) {
+                         PreparedStatement ps = conn.prepareStatement("INSERT INTO konversi_poin (nama_lengkap, poin_sampah) VALUES (?, ?)");) {
                         ps.setString(1, nama);
-                        ps.setString(2, email);
-                        ps.setString(3, alamat);
-                        ps.setString(4, noTelepon);
-                        ps.setString(5, poinSampah);
+                        ps.setString(2, poinSampah);
                         ps.executeUpdate();
                         JOptionPane.showMessageDialog(frame, "Data berhasil ditambahkan!");
 
@@ -141,14 +123,14 @@ public class KonversiPoinView {
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Fitur ubah data belum diimplementasikan.");
+                JOptionPane.showMessageDialog(frame, "Fitur ubah data belum diimplementasikan");
             }
         });
 
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Fitur hapus data belum diimplementasikan.");
+                JOptionPane.showMessageDialog(frame, "Fitur hapus data belum diimplementasikan");
             }
         });
 
