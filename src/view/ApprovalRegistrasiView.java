@@ -5,19 +5,20 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 public class ApprovalRegistrasiView extends JFrame {
+    @SuppressWarnings("Convert2Lambda")
     public ApprovalRegistrasiView() {
-
+        // Set frame properties
         setTitle("Approval Registrasi");
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(null);
 
-
+        // Panel untuk form data
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBounds(20, 20, 340, 300);
 
-
+        // Label dan TextField
         JLabel lblNama = new JLabel("Nama Lengkap:");
         lblNama.setBounds(20, 20, 100, 25);
         JTextField txtNama = new JTextField();
@@ -43,12 +44,13 @@ public class ApprovalRegistrasiView extends JFrame {
         JTextField txtPassword = new JTextField();
         txtPassword.setBounds(130, 180, 180, 25);
 
-
+        // Tombol Approve dan Reject
         JButton btnApprove = new JButton("Approve");
         btnApprove.setBounds(50, 240, 100, 30);
         JButton btnReject = new JButton("Reject");
         btnReject.setBounds(180, 240, 100, 30);
 
+        // Tambahkan komponen ke formPanel
         formPanel.add(lblNama);
         formPanel.add(txtNama);
         formPanel.add(lblEmail);
@@ -62,8 +64,10 @@ public class ApprovalRegistrasiView extends JFrame {
         formPanel.add(btnApprove);
         formPanel.add(btnReject);
 
+        // Tambahkan formPanel ke frame
         add(formPanel);
 
+        // Action untuk tombol Approve
         btnApprove.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -71,6 +75,7 @@ public class ApprovalRegistrasiView extends JFrame {
             }
         });
 
+        // Action untuk tombol Reject
         btnReject.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -78,10 +83,12 @@ public class ApprovalRegistrasiView extends JFrame {
             }
         });
 
+        // Tampilkan frame
         setVisible(true);
     }
 
     public static void open() {
+        // Buat instance dari ApprovalRegistrasiView
         new ApprovalRegistrasiView();
     }
 }
