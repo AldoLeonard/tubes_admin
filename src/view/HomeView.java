@@ -8,6 +8,7 @@ import javax.swing.*;
 
 
 public class HomeView extends JFrame{
+    @SuppressWarnings("Convert2Lambda")
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Bank Sampah");
