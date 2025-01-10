@@ -1,6 +1,8 @@
 package view;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
 public class UserView extends JFrame {
@@ -51,6 +53,22 @@ public class UserView extends JFrame {
         // Tombol Submit
         JButton submitButton = new JButton("Submit");
         submitButton.setBounds(120, 220, 100, 30);
+
+        // Tambahkan ActionListener untuk tombol Submit
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String nama = nameField.getText();
+                String email = emailField.getText();
+                String alamat = alamatField.getText();
+                String telepon = phoneField.getText();
+                String password = new String(passwordField.getPassword());
+
+                // Buka ApprovalRegistrasiView dan kirimkan data
+                ApprovalRegistrasiView approvalView = new ApprovalRegistrasiView();
+                approvalView.setData(nama, email, alamat, telepon, password);
+            }
+        });
 
         // Tambahkan komponen ke formPanel
         formPanel.add(nameLabel);
