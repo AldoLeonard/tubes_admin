@@ -107,7 +107,66 @@ public class DropboxView {
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Fitur ubah data belum diimplementasikan");
+                int selectedRow = table.getSelectedRow(); // Ambil baris yang dipilih
+                if (selectedRow != -1) { // Periksa apakah ada baris yang dipilih
+                    // Ambil data dari tabel
+                    String id = tableModel.getValueAt(selectedRow, 0).toString();
+                    String nama = tableModel.getValueAt(selectedRow, 1).toString();
+                    String kapasitas = tableModel.getValueAt(selectedRow, 2).toString();
+                    String status = tableModel.getValueAt(selectedRow, 3).toString();
+                    String alamat = tableModel.getValueAt(selectedRow, 4).toString();
+        
+                    // Buat form dengan data awal
+                    JTextField namaField = new JTextField(nama);
+                    JTextField kapasitasField = new JTextField(kapasitas);
+                    JTextField statusField = new JTextField(status);
+                    JTextField alamatField = new JTextField(alamat);
+        
+                    Object[] inputFields = {
+                        "Nama Dropbox:", namaField,
+                        "Kapasitas:", kapasitasField,
+                        "Status:", statusField,
+                        "Alamat Dropbox:", alamatField
+                    };
+        
+                    // Tampilkan form
+                    int option = JOptionPane.showConfirmDialog(frame, inputFields, "Ubah Data", JOptionPane.OK_CANCEL_OPTION);
+                    if (option == JOptionPane.OK_OPTION) {
+                        String namaBaru = namaField.getText();
+                        String kapasitasBaru = kapasitasField.getText();
+                        String statusBaru = statusField.getText();
+                        String alamatBaru = alamatField.getText();
+        
+                        if (!namaBaru.isEmpty() && !kapasitasBaru.isEmpty() && !statusBaru.isEmpty() && !alamatBaru.isEmpty()) {
+                            // Update data di database
+                            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/tubes_db", "root", "")) {
+                                String sql = "UPDATE drop_box SET nama_dropbox = ?, kapasitas = ?, status = ?, alamat = ? WHERE id = ?";
+                                try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                                    preparedStatement.setString(1, namaBaru);
+                                    preparedStatement.setString(2, kapasitasBaru);
+                                    preparedStatement.setString(3, statusBaru);
+                                    preparedStatement.setString(4, alamatBaru);
+                                    preparedStatement.setString(5, id);
+                                    preparedStatement.executeUpdate();
+        
+                                    // Update data di tabel GUI
+                                    tableModel.setValueAt(namaBaru, selectedRow, 1);
+                                    tableModel.setValueAt(kapasitasBaru, selectedRow, 2);
+                                    tableModel.setValueAt(statusBaru, selectedRow, 3);
+                                    tableModel.setValueAt(alamatBaru, selectedRow, 4);
+        
+                                    JOptionPane.showMessageDialog(frame, "Data berhasil diubah!");
+                                }
+                            } catch (SQLException ex) {
+                                JOptionPane.showMessageDialog(frame, "Gagal mengubah data di database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Semua field harus diisi.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Pilih baris yang ingin diubah.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
