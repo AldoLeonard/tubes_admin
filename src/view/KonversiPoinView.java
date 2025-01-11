@@ -120,12 +120,58 @@ public class KonversiPoinView {
             }
         });
 
-        updateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Fitur ubah data belum diimplementasikan");
+        
+updateButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        int selectedRow = table.getSelectedRow(); // Ambil baris yang dipilih
+        if (selectedRow != -1) { // Periksa apakah ada baris yang dipilih
+            // Ambil data dari tabel
+            int id = (int) tableModel.getValueAt(selectedRow, 0);
+            String namaAwal = (String) tableModel.getValueAt(selectedRow, 1);
+            int poinAwal = (int) tableModel.getValueAt(selectedRow, 2);
+
+            // Buat form input
+            JTextField namaField = new JTextField(namaAwal, 10);
+            JTextField poinField = new JTextField(String.valueOf(poinAwal), 10);
+
+            JPanel inputPanel = new JPanel(new GridLayout(2, 2));
+            inputPanel.add(new JLabel("Nama Lengkap:"));
+            inputPanel.add(namaField);
+            inputPanel.add(new JLabel("Poin Sampah:"));
+            inputPanel.add(poinField);
+
+            int result = JOptionPane.showConfirmDialog(frame, inputPanel, "Ubah Data", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                String namaBaru = namaField.getText();
+                String poinBaruStr = poinField.getText();
+
+                try {
+                    int poinBaru = Integer.parseInt(poinBaruStr); // Validasi input poin sebagai angka
+                    // Update data di database
+                    try (Connection conn = connect(); 
+                         PreparedStatement ps = conn.prepareStatement("UPDATE konversi_poin SET nama_lengkap = ?, poin_sampah = ? WHERE id = ?")) {
+                        ps.setString(1, namaBaru);
+                        ps.setInt(2, poinBaru);
+                        ps.setInt(3, id);
+                        ps.executeUpdate();
+                        JOptionPane.showMessageDialog(frame, "Data berhasil diubah!");
+
+                        // Memperbarui data di tabel GUI
+                        loadData(tableModel);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(frame, "Gagal mengubah data!");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Poin harus berupa angka.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        });
+        } else {
+            JOptionPane.showMessageDialog(frame, "Pilih baris yang ingin diubah.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+});
 
         deleteButton.addActionListener(new ActionListener() {
             @Override
