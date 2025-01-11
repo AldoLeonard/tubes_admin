@@ -41,7 +41,7 @@ public class JenisSampahView {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Gagal memuat data!");
+            JOptionPane.showMessageDialog(null, "Gagal untuk memuat data!");
         }
     }
 
