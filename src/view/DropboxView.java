@@ -163,6 +163,6 @@ public class DropboxView {
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Gagal memuat data dari database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+        }
+    }
 }
