@@ -138,61 +138,62 @@ public class JenisSampahView {
             }
         });
 
-        // Fungsi untuk mengubah data (belum diimplementasikan)
+        // Fungsi untuk mengubah data
         updateButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        int selectedRow = table.getSelectedRow(); // Ambil baris yang dipilih
-        if (selectedRow != -1) { // Periksa apakah ada baris yang dipilih
-            // Ambil data yang dipilih dari tabel
-            String jenisSampah = (String) tableModel.getValueAt(selectedRow, 1);
-            String totalBerat = (String) tableModel.getValueAt(selectedRow, 2).replace(" Kg", "");
-
-            // Buat form input untuk mengedit data
-            JTextField jenisField = new JTextField(jenisSampah);
-            JTextField beratField = new JTextField(totalBerat);
-
-            Object[] inputFields = {
-                "Jenis Sampah:", jenisField,
-                "Total Berat (kg):", beratField
-            };
-
-            int option = JOptionPane.showConfirmDialog(frame, inputFields, "Ubah Data", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String jenisBaru = jenisField.getText();
-                String beratBaru = beratField.getText();
-
-                if (!jenisBaru.isEmpty() && !beratBaru.isEmpty()) {
-                    // Update data di database
-                    try (Connection connection = DriverManager.getConnection(
-                            "jdbc:mysql://localhost:3306/tubes_db", "root", "")) {
-                        String sql = "UPDATE jenis_sampah SET nama_jenis_sampah = ?, total_berat = ? WHERE id = ?";
-                        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                            preparedStatement.setString(1, jenisBaru);
-                            preparedStatement.setString(2, beratBaru);
-                            preparedStatement.setInt(3, (int) tableModel.getValueAt(selectedRow, 0));
-                            preparedStatement.executeUpdate();
-
-                            // Update data di tabel GUI
-                            tableModel.setValueAt(jenisBaru, selectedRow, 1);
-                            tableModel.setValueAt(beratBaru + " Kg", selectedRow, 2);
-
-                            JOptionPane.showMessageDialog(frame, "Data berhasil diubah!");
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow(); // Ambil baris yang dipilih
+                if (selectedRow != -1) { // Periksa apakah ada baris yang dipilih
+                    // Ambil data yang dipilih dari tabel
+                    String jenisSampah = (String) tableModel.getValueAt(selectedRow, 1);
+                    Object value = tableModel.getValueAt(selectedRow, 2);
+                    String totalBerat = value != null ? value.toString().replace(" Kg", "") : "";
+        
+                    // Buat form input untuk mengedit data
+                    JTextField jenisField = new JTextField(jenisSampah);
+                    JTextField beratField = new JTextField(totalBerat);
+        
+                    Object[] inputFields = {
+                        "Jenis Sampah:", jenisField,
+                        "Total Berat (kg):", beratField
+                    };
+        
+                    int option = JOptionPane.showConfirmDialog(frame, inputFields, "Ubah Data", JOptionPane.OK_CANCEL_OPTION);
+                    if (option == JOptionPane.OK_OPTION) {
+                        String jenisBaru = jenisField.getText();
+                        String beratBaru = beratField.getText();
+        
+                        if (!jenisBaru.isEmpty() && !beratBaru.isEmpty()) {
+                            // Update data di database
+                            try (Connection connection = DriverManager.getConnection(
+                                    "jdbc:mysql://localhost:3306/tubes_db", "root", "")) {
+                                String sql = "UPDATE jenis_sampah SET nama_jenis_sampah = ?, total_berat = ? WHERE id = ?";
+                                try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                                    preparedStatement.setString(1, jenisBaru);
+                                    preparedStatement.setString(2, beratBaru);
+                                    preparedStatement.setInt(3, (int) tableModel.getValueAt(selectedRow, 0));
+                                    preparedStatement.executeUpdate();
+        
+                                    // Update data di tabel GUI
+                                    tableModel.setValueAt(jenisBaru, selectedRow, 1);
+                                    tableModel.setValueAt(beratBaru + " Kg", selectedRow, 2);
+        
+                                    JOptionPane.showMessageDialog(frame, "Data berhasil diubah!");
+                                }
+                            } catch (SQLException ex) {
+                                JOptionPane.showMessageDialog(frame, "Gagal mengubah data di database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Semua field harus diisi.", "Error", JOptionPane.ERROR_MESSAGE);
                         }
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(frame, "Gagal mengubah data di database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Semua field harus diisi.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Pilih baris yang ingin diubah.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } else {
-            JOptionPane.showMessageDialog(frame, "Pilih baris yang ingin diubah.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-});
+        });
 
-        // Fungsi untuk menghapus data (belum diimplementasikan)
+        //Fungsi untuk menghapus data
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
