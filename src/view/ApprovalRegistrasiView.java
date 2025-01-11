@@ -1,56 +1,59 @@
 package view;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import javax.swing.*;
 
 public class ApprovalRegistrasiView extends JFrame {
-    @SuppressWarnings("Convert2Lambda")
+    private JTextField txtNama;
+    private JTextField txtEmail;
+    private JTextField txtAlamat;
+    private JTextField txtTelepon;
+    private JTextField txtPassword;
+
     public ApprovalRegistrasiView() {
-        // Set frame properties
         setTitle("Approval Registrasi");
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(null);
 
-        // Panel untuk form data
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBounds(20, 20, 340, 300);
 
-        // Label dan TextField
         JLabel lblNama = new JLabel("Nama Lengkap:");
         lblNama.setBounds(20, 20, 100, 25);
-        JTextField txtNama = new JTextField();
+        txtNama = new JTextField();
         txtNama.setBounds(130, 20, 180, 25);
 
         JLabel lblEmail = new JLabel("Email:");
         lblEmail.setBounds(20, 60, 100, 25);
-        JTextField txtEmail = new JTextField();
+        txtEmail = new JTextField();
         txtEmail.setBounds(130, 60, 180, 25);
 
         JLabel lblAlamat = new JLabel("Alamat Rumah:");
         lblAlamat.setBounds(20, 100, 100, 25);
-        JTextField txtAlamat = new JTextField();
+        txtAlamat = new JTextField();
         txtAlamat.setBounds(130, 100, 180, 25);
 
         JLabel lblTelepon = new JLabel("No Telepon:");
         lblTelepon.setBounds(20, 140, 100, 25);
-        JTextField txtTelepon = new JTextField();
+        txtTelepon = new JTextField();
         txtTelepon.setBounds(130, 140, 180, 25);
 
         JLabel lblPassword = new JLabel("Password:");
         lblPassword.setBounds(20, 180, 100, 25);
-        JTextField txtPassword = new JTextField();
+        txtPassword = new JTextField();
         txtPassword.setBounds(130, 180, 180, 25);
 
-        // Tombol Approve dan Reject
         JButton btnApprove = new JButton("Approve");
         btnApprove.setBounds(50, 240, 100, 30);
         JButton btnReject = new JButton("Reject");
         btnReject.setBounds(180, 240, 100, 30);
 
-        // Tambahkan komponen ke formPanel
         formPanel.add(lblNama);
         formPanel.add(txtNama);
         formPanel.add(lblEmail);
@@ -64,31 +67,78 @@ public class ApprovalRegistrasiView extends JFrame {
         formPanel.add(btnApprove);
         formPanel.add(btnReject);
 
-        // Tambahkan formPanel ke frame
         add(formPanel);
 
-        // Action untuk tombol Approve
-        btnApprove.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Penyimpanan data berhasil", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+        // ActionListener untuk tombol Approve
+        btnApprove.addActionListener(e -> {
+            String nama = txtNama.getText();
+            String email = txtEmail.getText();
+            String alamat = txtAlamat.getText();
+            String telepon = txtTelepon.getText();
+            String password = txtPassword.getText();
+
+            if (telepon.length() > 15) {
+                JOptionPane.showMessageDialog(null, "Nomor telepon terlalu panjang. Maksimal 15 karakter.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!nama.isEmpty() && !email.isEmpty() && !alamat.isEmpty() && !telepon.isEmpty() && !password.isEmpty()) {
+                // Simpan data ke database
+                try (Connection connection = DriverManager.getConnection(
+                        "jdbc:mysql://localhost:3306/tubes_db", "root", "")) {
+
+                    String sql = "INSERT INTO users (nama, email, alamat, no_telepon, password) VALUES (?, ?, ?, ?, ?)";
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                        preparedStatement.setString(1, nama);
+                        preparedStatement.setString(2, email);
+                        preparedStatement.setString(3, alamat);
+                        preparedStatement.setString(4, telepon);
+                        preparedStatement.setString(5, password);
+                        preparedStatement.executeUpdate();
+
+                        JOptionPane.showMessageDialog(null, "Data berhasil disimpan ke database", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+                        clearFields(); // Kosongkan field setelah data berhasil disimpan
+
+                        //  // Pindah ke halaman HomeView
+                        // new HomeView(); 
+                        // dispose(); // Tutup ApprovalRegistrasiView
+
+                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Gagal menyimpan data ke database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Semua field harus diisi.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Action untuk tombol Reject
-        btnReject.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Data ditolak", "Informasi", JOptionPane.WARNING_MESSAGE);
-            }
+        // ActionListener untuk tombol Reject
+        btnReject.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null, "Data ditolak", "Informasi", JOptionPane.WARNING_MESSAGE);
+            clearFields(); // Kosongkan field setelah data ditolak
         });
 
-        // Tampilkan frame
+
         setVisible(true);
     }
 
+    public void setData(String nama, String email, String alamat, String telepon, String password) {
+        txtNama.setText(nama);
+        txtEmail.setText(email);
+        txtAlamat.setText(alamat);
+        txtTelepon.setText(telepon);
+        txtPassword.setText(password);
+    }
+
+    private void clearFields() {
+        txtNama.setText("");
+        txtEmail.setText("");
+        txtAlamat.setText("");
+        txtTelepon.setText("");
+        txtPassword.setText("");
+    }
+
     public static void open() {
-        // Buat instance dari ApprovalRegistrasiView
         new ApprovalRegistrasiView();
     }
 }
