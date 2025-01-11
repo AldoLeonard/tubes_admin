@@ -130,7 +130,7 @@ public class DropboxView {
                     };
         
                     // Tampilkan form
-                    int option = JOptionPane.showConfirmDialog(frame, inputFields, "Mengubah Data", JOptionPane.OK_CANCEL_OPTION);
+                    int option = JOptionPane.showConfirmDialog(frame, inputFields, "Ubah Data", JOptionPane.OK_CANCEL_OPTION);
                     if (option == JOptionPane.OK_OPTION) {
                         String namaBaru = namaField.getText();
                         String kapasitasBaru = kapasitasField.getText();
