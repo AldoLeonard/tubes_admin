@@ -74,7 +74,7 @@ public class KonversiPoinView {
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton addButton = new JButton("Tambah Data");
-        JButton updateButton = new JButton("Ubah Data");
+        JButton updateButton = new JButton("Mengubah Data");
         JButton deleteButton = new JButton("Hapus Data");
 
         buttonPanel.add(addButton);
