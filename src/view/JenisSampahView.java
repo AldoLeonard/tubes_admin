@@ -25,17 +25,17 @@ public class JenisSampahView {
     private static void loadData(DefaultTableModel tableModel) {
         // Hapus semua baris sebelumnya di tabel
         tableModel.setRowCount(0);
-        
+
         String query = "SELECT * FROM jenis_sampah";
         try (Connection conn = connect();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
-            
+
             while (rs.next()) {
                 Object[] row = {
                     rs.getInt("id"),
                     rs.getString("nama_jenis_sampah"),
-                    rs.getString("total_berat")
+                    rs.getString("total_berat") + " Kg" // Tambahkan " Kg" di sini
                 };
                 tableModel.addRow(row);
             }
@@ -55,9 +55,9 @@ public class JenisSampahView {
         JPanel mainPanel = new JPanel(new BorderLayout());
 
         // Nama kolom
-        String[] columnNames = {"ID", "Jenis Sampah", "Total Berat (kg)"};
+        String[] columnNames = {"ID", "Jenis Sampah", "Total Berat (Kg)"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        
+
         // Membuat tabel dengan model yang telah ditentukan
         JTable table = new JTable(tableModel) {
             // Membuat tabel tidak dapat diedit
@@ -66,16 +66,21 @@ public class JenisSampahView {
                 return false;
             }
         };
-        
+
         // Menambahkan gridlines pada tabel agar lebih rapi
         table.setShowGrid(true);
         table.setGridColor(Color.BLACK);
-        
+
         // Agar lebar kolom lebih sesuai
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(2).setPreferredWidth(150);
-        
+
+        // Agar kolom ID tidak terlihat
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
+
         // Menambahkan scrollbar pada tabel
         JScrollPane tableScrollPane = new JScrollPane(table);
         mainPanel.add(tableScrollPane, BorderLayout.CENTER);
@@ -105,7 +110,7 @@ public class JenisSampahView {
                 JPanel inputPanel = new JPanel(new GridLayout(2, 2));
                 inputPanel.add(new JLabel("Jenis Sampah:"));
                 inputPanel.add(jenisSampahField);
-                inputPanel.add(new JLabel("Total Berat (kg):"));
+                inputPanel.add(new JLabel("Total Berat (Kg):"));
                 inputPanel.add(totalBeratField);
 
                 int result = JOptionPane.showConfirmDialog(frame, inputPanel, "Tambah Data Jenis Sampah", JOptionPane.OK_CANCEL_OPTION);
@@ -123,7 +128,7 @@ public class JenisSampahView {
                     try (Connection conn = connect();
                          PreparedStatement ps = conn.prepareStatement("INSERT INTO jenis_sampah (nama_jenis_sampah, total_berat) VALUES (?, ?)")) {
                         ps.setString(1, jenisSampah);
-                        ps.setString(2, totalBerat); // Menggunakan String untuk total_berat
+                        ps.setString(2, totalBerat); // Simpan total_berat tanpa "Kg"
                         ps.executeUpdate();
 
                         // Memuat ulang data ke dalam tabel
@@ -148,21 +153,21 @@ public class JenisSampahView {
                     String jenisSampah = (String) tableModel.getValueAt(selectedRow, 1);
                     Object value = tableModel.getValueAt(selectedRow, 2);
                     String totalBerat = value != null ? value.toString().replace(" Kg", "") : "";
-        
+
                     // Buat form input untuk mengedit data
                     JTextField jenisField = new JTextField(jenisSampah);
                     JTextField beratField = new JTextField(totalBerat);
-        
+
                     Object[] inputFields = {
                         "Jenis Sampah:", jenisField,
                         "Total Berat (kg):", beratField
                     };
-        
+
                     int option = JOptionPane.showConfirmDialog(frame, inputFields, "Ubah Data", JOptionPane.OK_CANCEL_OPTION);
                     if (option == JOptionPane.OK_OPTION) {
                         String jenisBaru = jenisField.getText();
                         String beratBaru = beratField.getText();
-        
+
                         if (!jenisBaru.isEmpty() && !beratBaru.isEmpty()) {
                             // Update data di database
                             try (Connection connection = DriverManager.getConnection(
@@ -173,11 +178,11 @@ public class JenisSampahView {
                                     preparedStatement.setString(2, beratBaru);
                                     preparedStatement.setInt(3, (int) tableModel.getValueAt(selectedRow, 0));
                                     preparedStatement.executeUpdate();
-        
+
                                     // Update data di tabel GUI
                                     tableModel.setValueAt(jenisBaru, selectedRow, 1);
-                                    tableModel.setValueAt(beratBaru + " Kg", selectedRow, 2);
-        
+                                    tableModel.setValueAt(beratBaru + " Kg", selectedRow, 2); // Tambahkan " Kg" saat memperbarui
+
                                     JOptionPane.showMessageDialog(frame, "Data berhasil diubah!");
                                 }
                             } catch (SQLException ex) {
@@ -193,7 +198,7 @@ public class JenisSampahView {
             }
         });
 
-        //Fungsi untuk menghapus data
+        // Fungsi untuk menghapus data
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -203,7 +208,7 @@ public class JenisSampahView {
                     if (confirm == JOptionPane.YES_OPTION) {
                         // Ambil ID dari tabel
                         int id = (int) tableModel.getValueAt(selectedRow, 0);
-        
+
                         // Hapus data dari database
                         try (Connection connection = DriverManager.getConnection(
                                 "jdbc:mysql://localhost:3306/tubes_db", "root", "")) {
@@ -211,10 +216,10 @@ public class JenisSampahView {
                             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                                 preparedStatement.setInt(1, id);
                                 preparedStatement.executeUpdate();
-        
+
                                 // Hapus data dari tabel GUI
                                 tableModel.removeRow(selectedRow);
-        
+
                                 JOptionPane.showMessageDialog(frame, "Data berhasil dihapus!");
                             }
                         } catch (SQLException ex) {
